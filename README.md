@@ -1,2 +1,5 @@
-# d-username
-username based account system design
+# TBD
+[Chinese Docs](/zh-cn/) is available now
+
+
+
