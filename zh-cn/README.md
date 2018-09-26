@@ -9,8 +9,7 @@ graph LR
 inputName[输入用户名!1]
 checkHasName{检测用户是否存在}
 checkRegistrable{检测是否可注册!2}
-inputPassword[输入密码]
-checkPassword{检测密码是否正确}
+PasswordFlow>密码登录流程]
 outputToken[成功 返回token!3]
 outputFail[无当前用户]
 inputNewPassword[输入新密码]
@@ -18,10 +17,7 @@ inputNewInfo[可选 输入额外信息!4]
 
 inputName --> checkHasName
 
-checkHasName --是--> inputPassword
-inputPassword --> checkPassword
-checkPassword --否--> inputPassword
-checkPassword --> outputToken
+checkHasName --是--> PasswordFlow
 
 checkHasName --否--> checkRegistrable
 checkRegistrable --是--> inputNewPassword
@@ -36,6 +32,23 @@ checkRegistrable --否--> outputFail
 3. token是包含用户信息的签名，例如[jwt](https://jwt.io/)
 4. 额外信息可让用户额外提供手机号邮箱等，保障账户不被滥用
 
+# 密码登录流程
+```mermaid
+graph LR
+Name[已确认的用户账户!1]
+inputPassword[输入密码]
+checkPassword{密码正确?}
+outputToken[成功 返回token!2]
+
+Name --是--> inputPassword
+inputPassword --> checkPassword
+checkPassword --否--> inputPassword
+checkPassword --> outputToken
+```
+**Tips**   
+1. 用户账户需要通过用户名或者第三方账户查询到，并由用户确认是其账户
+2. token是包含用户信息的签名，例如[jwt](https://jwt.io/)
+
 # 第三方账户
  第三方账户分为以邮箱手机号为主的验证码方式登录的账户与以GitHub、Google、QQ为主的社交账户。
 
@@ -47,7 +60,7 @@ sequenceDiagram
     participant T as Third(mail/phone)
     U->>S: 提供邮箱\手机号账户
     S->>T: 请求发送验证码
-    T->>U: 发送验证码只用户
+    T->>U: 发送验证码给用户
     U->>S: 提供收到的验证码
     Note over S: 如果验证码准确执行第三方账户登录流程!1
 ```
@@ -74,4 +87,32 @@ sequenceDiagram
 ```
 
 ## 第三方账户登录流程
-> TBD 累了之后在填坑
+```mermaid
+graph LR
+PasswordFlow>密码登录流程]
+findName[查找用户名!1]
+hasName{是否存在}
+outputToken[成功 返回token]
+inputName[输入用户名]
+checkName{检测是否存在}
+sureName{是否绑定?!2}
+checkRegistrable{可注册?}
+inputPassword[输入密码]
+outputToken[成功 返回token]
+
+findName --> hasName
+hasName --是--> outputToken
+hasName --否--> inputName
+inputName --> checkName
+checkName --是--> sureName
+sureName --否--> inputName
+sureName --是--> PasswordFlow
+
+checkName --否--> checkRegistrable
+checkRegistrable --否--> inputName
+checkRegistrable --是--> inputPassword
+inputPassword --> outputToken
+``` 
+**Tips**   
+1. 根据第三方账户去查询用户名
+2. 根据公开的用户信息，确认该用户是否是用户期望绑定的账户

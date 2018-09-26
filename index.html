@@ -19,6 +19,9 @@
   <div id="app"></div>
   <script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script>
+    if (typeof navigator.serviceWorker !== 'undefined') {
+        navigator.serviceWorker.register('sw.js')
+    }
     mermaid.initialize({ startOnLoad: false });
     window.$docsify = {
       name: 'Username Based System',
